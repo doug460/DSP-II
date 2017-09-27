@@ -1,0 +1,7 @@
+Project Notes
+
+Thinking of doing Kalman Filter design for tracking
+
+So kalman filter is based on gausian distrobutions, so it will inherently perform better on that type of noise
+based on bayesian statistics, the bayesian inference can converge to a gausian distribution
+
