@@ -1,0 +1,14 @@
+Notes for Project
+
+Understanding paper:
+
+FFT of data
+Basically does Adaptive Spectral Subtraction
+Kalman Filter
+ASS again
+Kalmn filter
+IFFT
+output.
+
+I do not believe this is faster than origonal Kalman filter at all... but what do i know
+I'll give it a try and see how it performs. 
