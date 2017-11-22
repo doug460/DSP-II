@@ -70,9 +70,8 @@ if __name__ == '__main__':
     data20 = data + noise20
     print('New snr is ', snrDb(data, noise20))
 
-#     plt.figure
-#     plt.plot(data20)
-#     plt.show()
+    fig = plt.figure()
+    plt.plot(data20)
     
     ####################################
     # noise doing 0 db noise
@@ -92,9 +91,9 @@ if __name__ == '__main__':
     
     
     
-#     plt.figure
-#     plt.plot(data0)
-#     plt.show()  
+    fig = plt.figure()
+    plt.plot(data0)
+    plt.show()  
     
     
 

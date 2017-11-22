@@ -2,12 +2,8 @@ Notes for Project
 
 Understanding paper:
 
-FFT of data
-Basically does Adaptive Spectral Subtraction
-Kalman Filter
-Kalmn filter
-IFFT
-output.
+So flooring coeficient is really needed!
 
-I do not believe this is faster than origonal Kalman filter at all... but what do i know
-I'll give it a try and see how it performs. 
+Error for calculating covariance of x in paper, just order is messed up
+
+Scaling is important that the author does not do in the paper!
