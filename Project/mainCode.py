@@ -69,7 +69,7 @@ if __name__ == '__main__':
     dirData = '/media/dabrown/BC5C17EB5C179F68/Users/imdou/My Documents/School/School 2017 Fall/DSP/Project/'
     dirOut = dirData + 'data/'
     
-    baseFreq = 6000
+    baseFreq = 12000
     baseSegment = 256
     floorCo = 1000
     
@@ -82,9 +82,7 @@ if __name__ == '__main__':
     lengthOld = len(data)
     factor = math.ceil(rate/baseFreq)
     data = decimate(data, factor, zero_phase = True)
-    lengthNew = len(data)
-    
-    
+    lengthNew = len(data)    
     
     # add noise
     dataPower = power(data)  
@@ -92,13 +90,13 @@ if __name__ == '__main__':
     desiredSNR = 20
     upper = sqrt(dataPower * 10**-(desiredSNR / 10))
     noise0 = [gauss(0.0, upper) for i in range(len(data))]
-     
-    data = data + noise0
     
     
     
      # break data into 256 segments
-    segments = math.floor(lengthNew / baseSegment)    
+    segments = math.floor(lengthNew / baseSegment) 
+    data_org = np.copy(data[0:segments * baseSegment]) 
+    data = data + noise0  
     data = data[0:segments * baseSegment]
     dataSegs = np.reshape(data, (segments, baseSegment))
 
@@ -210,6 +208,25 @@ if __name__ == '__main__':
             
             
         SEG_OUT[indx] = x_minus
+        
+    # get output data
+    seg_out = np.fft.ifft(SEG_OUT)
+    out = np.reshape(seg_out, (segments*baseSegment))
+        
+    # get error
+    # scale output
+    data_max = np.max(data_org)
+    out_max = np.max(out)
+    out = np.multiply(out, data_max/out_max)
+    
+    error = 100*np.sum(np.abs(np.divide(data_org - out, data_org)))/len(data_org)
+    
+    fig =plt.figure()
+    plt.plot(data_org)
+    plt.title('Original Data')
+    plt.xlabel('n')
+    plt.ylabel('y')
+    plt.savefig(dirOut + 'org.png')
     
     # plot origonal data
     fig = plt.figure()
@@ -221,23 +238,6 @@ if __name__ == '__main__':
     plt.savefig(dirOut + str)
     
     
-    # get text stuff and save to txt file
-    execTime = time.time() - start_time
-    buf = 'execution time %d\n' % (execTime)
-    buf += 'baseFreq %d\n' % (baseFreq)
-    buf += 'Segment Size %d\n' % (baseSegment)
-    buf += 'Flooring Coeficient %d\n' % (floorCo)
-    buf += 'SNR %d \n' % (desiredSNR)
-    
-    str = '%d_snr.txt' % (desiredSNR)
-    file  = open(dirOut + str,'w')
-    file.write(buf)
-    file.close()
-   
-
-    # get output data
-    seg_out = np.fft.ifft(SEG_OUT)
-    out = np.reshape(seg_out, (segments*baseSegment))
     
     plt.figure()
     plt.title('Filtered Data %d db SNR' % (desiredSNR))
@@ -246,6 +246,25 @@ if __name__ == '__main__':
     plt.plot(out)
     str = '%d_snr_our.png' % (desiredSNR)
     plt.savefig(dirOut + str)
+    
+    
+    # get text stuff and save to txt file
+    execTime = time.time() - start_time
+    buf = 'average error is %d%%\n' % (error)
+    buf += 'execution time %d\n' % (execTime)
+    buf += 'baseFreq %d\n' % (baseFreq)
+    buf += 'Segment Size %d\n' % (baseSegment)
+    buf += 'Flooring Coeficient %d\n' % (floorCo)
+    buf += 'SNR %d \n' % (desiredSNR)
+    print(buf)
+    
+    str = '%d_snr.txt' % (desiredSNR)
+    file  = open(dirOut + str,'w')
+    file.write(buf)
+    file.close()
+   
+
+    
     
     plt.show()
 

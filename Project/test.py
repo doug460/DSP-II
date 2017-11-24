@@ -9,5 +9,6 @@ if __name__ == '__main__':
     pass
 
     a = np.array([1j + 2,2,3]);
+    b = np.array([1, 2, 4])
     
-    print(np.multiply(a,2))
+    print(np.divide(a,b))
