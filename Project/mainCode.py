@@ -9,6 +9,7 @@ The paper this is based on is a pain in the Adaptive Spectral Subtraction :P
 from scipy.io.wavfile import read
 from scipy.stats import signaltonoise
 from scipy.signal import decimate
+from scipy.io.wavfile import write
 import numpy as np
 from numpy import*
 import matplotlib.pyplot as plt
@@ -133,8 +134,6 @@ if __name__ == '__main__':
         
         # get initial x
         x_minus = np.matrix(np.zeros(len(SEG)), dtype = np.complex128)
-        
-        
         
         
         # do kalman filter 
@@ -262,8 +261,14 @@ if __name__ == '__main__':
     file  = open(dirOut + str,'w')
     file.write(buf)
     file.close()
-   
-
+    
+    print('Saving wave files...')
+    str = 'origonal.wav'
+    write(dirOut + str, baseFreq, data_org)
+    str = 'in_%dsnr.wav' % (desiredSNR)
+    write(dirOut + str, baseFreq, data)
+    str = 'out_%dsnr.wav' % (desiredSNR)
+    write(dirOut + str, baseFreq, np.real(out))
     
     
     plt.show()
