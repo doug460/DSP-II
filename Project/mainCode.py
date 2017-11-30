@@ -16,7 +16,6 @@ import matplotlib.pyplot as plt
 from random import gauss
 import cmath
 import time
-from bokeh.plotting.figure import figure
 
 
 def power(signal):
@@ -108,7 +107,7 @@ if __name__ == '__main__':
     
     
     
-     # break data into 256 segments
+    # break data into 256 segments
     segments = math.floor(lengthNew / baseSegment) 
     data_org = np.copy(data[0:segments * baseSegment]) 
     data = data + noise0  
