@@ -16,10 +16,18 @@ import matplotlib.pyplot as plt
 from random import gauss
 import cmath
 import time
+from bokeh.plotting.figure import figure
 
 
+def power(signal):
+    amp = np.sum(np.power(np.abs(signal),2))/len(signal)
+    return amp
 
-from wavTest import power
+def snrDb(signal, noise):
+    p1 = power(signal)
+    p2 = power(noise)
+    
+    return 10 * log10(p1/p2)
 
 def rms(array):
     sum = 0
@@ -43,8 +51,8 @@ def getAlpha(Xe):
 def getInitial(SEG, NOISE, Xe, floorCo):
     alpha = getAlpha(Xe)
     
-    Px = np.power(np.abs(SEG), 2)/len(SEG)
-    Pn = np.power(np.abs(NOISE), 2)/len(NOISE)
+    Px = np.power(np.abs(SEG), 2)
+    Pn = np.power(np.abs(NOISE), 2)
     
     Ps = Px - alpha * Pn
     
@@ -53,8 +61,13 @@ def getInitial(SEG, NOISE, Xe, floorCo):
     
     for indx in range(size):
         P[indx][indx] = max([Ps[indx],floorCo*Px[indx]])
-        
-    return np.matrix(P) 
+
+    # get result of power subtraction
+    ASS = np.zeros((size,size), dtype=np.complex128)
+    for indx in range(size):
+        ASS = SEG[indx] * P[indx][indx]/Px[indx]
+
+    return np.matrix(P), ASS
 
 def getH(k, baseSegment):
     H = np.zeros((baseSegment), dtype = np.complex128)
@@ -67,12 +80,13 @@ def getH(k, baseSegment):
 if __name__ == '__main__':
     pass
 
-    dirData = '/media/dabrown/BC5C17EB5C179F68/Users/imdou/My Documents/School/School 2017 Fall/DSP/Project/'
+#     dirData = '/media/dabrown/BC5C17EB5C179F68/Users/imdou/My Documents/School/School 2017 Fall/DSP/Project/'
+    dirData =  'F:/Documents/School/School 2017 Fall/DSP/Project/'
     dirOut = dirData + 'data/'
     
-    baseFreq = 12000
+    baseFreq = 6000
     baseSegment = 256
-    floorCo = 1000
+    floorCo = 0
     
     # get data and cut of ends
     rate, data =read(dirData + 'dsp3.wav')   
@@ -88,7 +102,7 @@ if __name__ == '__main__':
     # add noise
     dataPower = power(data)  
      
-    desiredSNR = 20
+    desiredSNR = 100000
     upper = sqrt(dataPower * 10**-(desiredSNR / 10))
     noise0 = [gauss(0.0, upper) for i in range(len(data))]
     
@@ -111,6 +125,9 @@ if __name__ == '__main__':
     # array to hold output stuff
     SEG_OUT = np.zeros(dataSegs.shape, dtype = np.complex128)
     
+    ASS1 = np.zeros(dataSegs.shape, dtype = np.complex128)
+    ASS2 = np.zeros(dataSegs.shape, dtype = np.complex128)
+    
     # how long it takes stuff to run
     start_time = time.time()
 
@@ -129,8 +146,8 @@ if __name__ == '__main__':
             chi = 0
         
         # get P estimation
-        P_minus = getInitial(SEG, NOISE, chi, floorCo)
-#         P_minus = np.zeros((256,256), dtype = np.complex128)
+        P_minus, ASS1[indx] = getInitial(SEG, NOISE, chi, floorCo)
+#         P_minus = np.ones((256,256), dtype = np.complex128)
         
         # get initial x
         x_minus = np.matrix(np.zeros(len(SEG)), dtype = np.complex128)
@@ -175,8 +192,8 @@ if __name__ == '__main__':
             chi = 0
         
         # get P estimation
-        P_minus = getInitial(SEG, NOISE, chi, floorCo)
-#         P_minus = np.zeros((256,256),dtype = np.complex128)
+        P_minus, ASS2[indx] = getInitial(SEG, NOISE, chi, floorCo)
+#         P_minus = np.ones((256,256),dtype = np.complex128)
         
         # get initial x
         x_minus = np.matrix(np.zeros(len(SEG)), dtype = np.complex128)
@@ -211,6 +228,10 @@ if __name__ == '__main__':
     # get output data
     seg_out = np.fft.ifft(SEG_OUT)
     out = np.reshape(seg_out, (segments*baseSegment))
+    
+    # reshape adaptive spectral subtraction
+    ass1 = np.fft.ifft(ASS1)
+    ass1 = np.reshape(ass1, (segments * baseSegment))
         
     # get error
     # scale output
@@ -220,6 +241,8 @@ if __name__ == '__main__':
     
     error = 100*np.sum(np.abs(np.divide(data_org - out, data_org)))/len(data_org)
     
+    
+    # plot origonal data    
     fig =plt.figure()
     plt.plot(data_org)
     plt.title('Original Data')
@@ -227,7 +250,7 @@ if __name__ == '__main__':
     plt.ylabel('y')
     plt.savefig(dirOut + 'org.png')
     
-    # plot origonal data
+    # plot input data
     fig = plt.figure()
     plt.title('Input Data %d dB SNR' % (desiredSNR))
     plt.xlabel('n')
@@ -236,14 +259,18 @@ if __name__ == '__main__':
     str = '%d_snr_in.png' % (desiredSNR)
     plt.savefig(dirOut + str)
     
+    # plot result after first ASS
+    fig = plt.figure()
+    plt.plot(ass1)
+    plt.title('ASS')
     
-    
+    # plot filtered data
     plt.figure()
     plt.title('Filtered Data %d db SNR' % (desiredSNR))
     plt.ylabel('Estimated')
     plt.xlabel('n')
     plt.plot(out)
-    str = '%d_snr_our.png' % (desiredSNR)
+    str = '%d_snr_out.png' % (desiredSNR)
     plt.savefig(dirOut + str)
     
     
