@@ -23,7 +23,8 @@ if __name__ == '__main__':
     pass
 
 #     dirData = '/media/dabrown/BC5C17EB5C179F68/Users/imdou/My Documents/School/School 2017 Fall/DSP/Project/'
-    dirData =  'F:/Documents/School/School 2017 Fall/DSP/Project/'
+#     dirData =  'F:/Documents/School/School 2017 Fall/DSP/Project/'
+    dirData = 'C:/Users/imdou/My Documents/School/School 2017 Fall/DSP/Project/'
     dirOut = dirData + 'data/'
     
     baseFreq = 12000
@@ -79,13 +80,16 @@ if __name__ == '__main__':
     dataOut = np.reshape(segs_out, baseSegment * segments)
     
     # get error (scale automatically just because
-    maxIn = np.max(data)
+    maxIn = np.max(data_org)
     maxOut = np.max(dataOut)
     scaled = dataOut * maxIn / maxOut
-    error = sqrt(np.mean(np.power(data-scaled,2)))
+    error = sqrt(np.mean(np.power(data_org-scaled,2)))
+    
+    error_noise = sqrt(np.mean(np.power(data_org-data,2)))
 
     # save string of info
     buf = 'RMS error is %.1f%%\n' % (error)
+    buf += 'RMS error noise to orgonal%.1f%%\n' % (error_noise)
     buf += 'baseFreq %d\n' % (baseFreq)
     buf += 'Segment Size %d\n' % (baseSegment)
     buf += 'Flooring Coeficient %d\n' % (floorCo)

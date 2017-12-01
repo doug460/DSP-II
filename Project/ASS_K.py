@@ -56,7 +56,8 @@ def getH(k, baseSegment):
 if __name__ == '__main__':
     pass
 #     dirData = '/media/dabrown/BC5C17EB5C179F68/Users/imdou/My Documents/School/School 2017 Fall/DSP/Project/'
-    dirData =  'F:/Documents/School/School 2017 Fall/DSP/Project/'
+#     dirData =  'F:/Documents/School/School 2017 Fall/DSP/Project/'
+    dirData = 'C:/Users/imdou/My Documents/School/School 2017 Fall/DSP/Project/'
     dirOut = dirData + 'data/'
     
     baseFreq = 12000
@@ -168,10 +169,10 @@ if __name__ == '__main__':
     
     
     # get error (scale automatically just because
-    maxIn = np.max(data)
+    maxIn = np.max(data_org)
     maxOut = np.max(dataOut)
     scaled = dataOut * maxIn / maxOut
-    error = sqrt(np.mean(np.power(data-scaled,2)))
+    error = sqrt(np.mean(np.power(data_org-scaled,2)))
 
     # save string of info
     buf = 'RMS error is %.1f%%\n' % (error)

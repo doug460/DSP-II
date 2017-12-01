@@ -56,7 +56,8 @@ def getH(k, baseSegment):
 if __name__ == '__main__':
     pass
 #     dirData = '/media/dabrown/BC5C17EB5C179F68/Users/imdou/My Documents/School/School 2017 Fall/DSP/Project/'
-    dirData =  'F:/Documents/School/School 2017 Fall/DSP/Project/'
+#    dirData =  'F:/Documents/School/School 2017 Fall/DSP/Project/'
+    dirData = 'C:/Users/imdou/My Documents/School/School 2017 Fall/DSP/Project/'
     dirOut = dirData + 'data/'
     
     baseFreq = 12000
@@ -77,7 +78,7 @@ if __name__ == '__main__':
     # add noise
     dataPower = power(data)  
      
-    desiredSNR = 0
+    desiredSNR = 20
     upper = sqrt(dataPower * 10**-(desiredSNR / 10))
     noise0 = [gauss(0.0, upper) for i in range(len(data))]
     
@@ -162,7 +163,7 @@ if __name__ == '__main__':
         
     # scale the data
     dataOut = np.fft.ifft(SEGS_OUT)
-    maxIn = np.max(data)
+    maxIn = np.max(data_org)
     maxOut = np.max(np.max(dataOut))
     dataOut = dataOut * maxIn / maxOut
     
@@ -222,7 +223,7 @@ if __name__ == '__main__':
     
     dataOut = np.reshape(dataOut, baseSegment*segments)
     plt.plot(dataOut)
-    plt.title('SS + K  at %ddB SNR' % (desiredSNR))
+    plt.title('SS + K Double at %ddB SNR' % (desiredSNR))
     plt.ylabel('y[n]')
     plt.xlabel('n')
     out = dirOut + 'SS_K_double_%dsnr.png' % (desiredSNR)
@@ -230,10 +231,10 @@ if __name__ == '__main__':
     
     
     # get error (scale automatically just because
-    maxIn = np.max(data)
+    maxIn = np.max(data_org)
     maxOut = np.max(dataOut)
     scaled = dataOut * maxIn / maxOut
-    error = sqrt(np.mean(np.power(data-scaled,2)))
+    error = sqrt(np.mean(np.power(data_org-scaled,2)))
 
     # save string of info
     buf = 'RMS error is %.1f%%\n' % (error)
